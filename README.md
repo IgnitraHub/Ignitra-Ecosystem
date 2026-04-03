@@ -1,391 +1,101 @@
-# DeviceAI Runtime
+<p align="center">
+<img width="400" height="400" alt="hf_20260309_045718_0a075c8b-05d0-4610-8f94-1dfe0136d849" src="https://github.com/IgnitraHub/Ignitra/blob/main/ignitra__pd_1-removebg-preview.png" />
 
-**On-device AI runtime for Kotlin, iOS, Flutter, and React Native. Ship speech recognition, synthesis, and LLM inference on Android, iOS, and Desktop — no cloud required, no latency, no privacy risk.**
+<p align="center">
+  <h1 align="center">Ignitra AI</h1>
+</p>
 
-[![Build](https://github.com/deviceai-labs/deviceai/actions/workflows/ci.yml/badge.svg)](https://github.com/deviceai-labs/deviceai/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/dev.deviceai/speech)](https://central.sonatype.com/artifact/dev.deviceai/speech)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.2-blueviolet?logo=kotlin)](https://kotlinlang.org)
-[![KMP](https://img.shields.io/badge/Kotlin_Multiplatform-Android%20%7C%20iOS%20%7C%20Desktop-blue)](https://www.jetbrains.com/kotlin-multiplatform/)
+<div align="center">
+  <p><strong>AI-first crypto analytics and trading workspace for Solana</strong></p>
+  <p>
+    Token intelligence • Wallet profiling • Narrative research • Credit-based execution
+  </p>
+</div>
 
----
+<div align="center">
 
-## What's available
+[![Web App](https://img.shields.io/badge/Web%20App-Open-3b82f6?style=for-the-badge&logo=googlechrome&logoColor=white)](https://your-web-app-link)
+[![Telegram Mini App](https://img.shields.io/badge/Telegram%20Mini%20App-Soon-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/your_mini_app)
+[![Docs](https://img.shields.io/badge/Docs-Read-8b5cf6?style=for-the-badge&logo=readthedocs&logoColor=white)](https://your-docs-link)
+[![X.com](https://img.shields.io/badge/X.com-Follow-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/your_account)
+[![Telegram Community](https://img.shields.io/badge/Telegram%20Community-Join-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/your_community)
 
-| Module | Language | Distribution | Status |
-|--------|----------|--------------|--------|
-| `kotlin/core` | Kotlin (Android + KMP) | Maven Central `dev.deviceai:core` | ✅ Available |
-| `kotlin/speech` | Kotlin (Android + KMP) | Maven Central `dev.deviceai:speech` | ✅ Available |
-| `kotlin/llm` | Kotlin (Android + KMP) | Maven Central `dev.deviceai:llm` | ✅ Available |
-| `ios/speech` | Swift | Swift Package Index | 🗓 Planned |
-| `flutter/speech` | Dart | pub.dev `deviceai_speech` | 🗓 Planned |
-| `react-native/speech` | TypeScript | npm `react-native-deviceai-speech` | 🗓 Planned |
+</div>
 
-Each SDK is **independent and native to its platform** — they all call the same C++ engines (whisper.cpp, sherpa-onnx, llama.cpp) directly, with no cross-language bridging.
+> [!IMPORTANT]
+> Ignitra AI is built around one unified account across the web app, API, browser extension, and future Telegram Mini App
 
----
+> [!TIP]
+> Start with the free tier, run a token check or wallet scan, then move deeper only when the setup matches your risk style
 
-## Repository structure
+## One-Liner
 
-```
-deviceai/
-├── kotlin/
-│   ├── core/       dev.deviceai:core    ✅  model management, storage, logging
-│   ├── speech/     dev.deviceai:speech  ✅  STT (Whisper) + TTS (sherpa-onnx) + VAD
-│   └── llm/        dev.deviceai:llm     ✅  LLM inference via llama.cpp + offline RAG
-├── ios/
-│   └── speech/     Swift Package            🗓  Swift async/await wrapper
-├── flutter/
-│   └── speech/     pub.dev: deviceai_speech 🗓  Flutter plugin
-├── react-native/
-│   └── speech/     npm: react-native-deviceai-speech  🗓  TurboModule
-└── samples/
-    ├── composeApp/ Compose Multiplatform demo  ✅
-    └── iosApp/     native iOS shell            ✅
+Ignitra AI turns messy on-chain data, wallet behavior, and market context into fast, readable trading intelligence
+
+## Demo
+
+```text
+Paste token → Run analysis → Read scores + AI verdict → Decide → Swap via Jupiter
+Paste wallet → Get PnL + behavior profile + risk labels in seconds
 ```
 
----
+> [!NOTE]
+> The browser extension and Telegram Mini App are part of the product direction and connect into the same Ignitra credit and account system
 
-## Integration — Kotlin (Android, KMP, Desktop)
-
-### Step 1 — Add dependencies
-
-```kotlin
-// build.gradle.kts
-implementation("dev.deviceai:core:0.2.0-alpha02")
-implementation("dev.deviceai:speech:0.2.0-alpha02")   // STT + TTS + VAD
-implementation("dev.deviceai:llm:0.2.0-alpha02")      // LLM inference + RAG
-```
-
-No extra repository config needed — all artifacts are on Maven Central.
-
----
-
-### Step 2 — Initialize the SDK
-
-Call `DeviceAI.initialize()` **once** at app startup before using any module.
-
-#### Android
-
-```kotlin
-import dev.deviceai.core.DeviceAI
-import dev.deviceai.core.Environment
-import dev.deviceai.models.PlatformStorage
-
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        PlatformStorage.initialize(this)
-        DeviceAI.initialize(context = this) {
-            environment = Environment.Development
-        }
-        setContent { App() }
-    }
-}
-```
-
-#### iOS (Kotlin side of a KMP project)
-
-```kotlin
-import dev.deviceai.core.DeviceAI
-import dev.deviceai.core.Environment
-
-private val sdkInit by lazy {
-    DeviceAI.initialize { environment = Environment.Development }
-}
-
-fun MainViewController(): UIViewController {
-    sdkInit
-    return ComposeUIViewController { App() }
-}
-```
-
-#### Desktop
-
-```kotlin
-import dev.deviceai.core.DeviceAI
-import dev.deviceai.core.Environment
-
-fun main() = application {
-    DeviceAI.initialize { environment = Environment.Development }
-    Window(onCloseRequest = ::exitApplication, title = "My App") { App() }
-}
-```
-
-#### With cloud backend (Staging / Production)
-
-```kotlin
-DeviceAI.initialize(context = this, apiKey = "dai_live_...") {
-    environment   = Environment.Production
-    telemetry     = Telemetry.Enabled
-    appVersion    = BuildConfig.VERSION_NAME
-    appAttributes = mapOf("user_tier" to "premium")
-}
-```
-
----
-
-### Step 3 — Download a model
-
-`ModelRegistry` fetches the catalog from HuggingFace and downloads models to local storage. Downloads are resumable on interruption.
-
-```kotlin
-import dev.deviceai.models.ModelRegistry
-
-val model = ModelRegistry.getOrDownload("ggml-tiny.en.bin") { progress ->
-    println("${progress.percentComplete.toInt()}% — ${progress.bytesDownloaded / 1_000_000}MB")
-}
-```
-
-> **whisper-tiny.en** (75 MB) runs 7× faster than real-time on mid-range Android hardware.
-
----
-
-### Step 4 — Transcribe speech
-
-```kotlin
-import dev.deviceai.SpeechBridge
-import dev.deviceai.SttConfig
-
-SpeechBridge.initStt(model.modelPath, SttConfig(language = "en", useGpu = true))
-
-val text: String = SpeechBridge.transcribeAudio(samples) // FloatArray, 16kHz mono PCM
-// or
-val text: String = SpeechBridge.transcribe("/path/to/audio.wav")
-
-SpeechBridge.shutdownStt()
-```
-
----
-
-### Step 5 — Synthesize speech (optional)
-
-```kotlin
-import dev.deviceai.SpeechBridge
-import dev.deviceai.TtsConfig
-
-SpeechBridge.initTts(
-    modelPath  = voice.modelPath,
-    tokensPath = voice.tokensPath,
-    config     = TtsConfig(speechRate = 1.0f)
-)
-
-val pcm: ShortArray = SpeechBridge.synthesize("Hello from DeviceAI.")
-// Play with AudioTrack (Android), AVAudioEngine (iOS), or javax.sound (Desktop)
-
-SpeechBridge.shutdownTts()
-```
-
----
-
-### Step 6 — Run a local LLM
-
-```kotlin
-import dev.deviceai.core.DeviceAI
-import dev.deviceai.llm.llm
-
-// Create a chat session — model loads once, history is automatic
-val session = DeviceAI.llm.chat("/path/to/model.gguf") {
-    systemPrompt = "You are a helpful assistant."
-    maxTokens    = 512
-    temperature  = 0.7f
-    useGpu       = true
-}
-
-// Streaming (recommended for UI)
-session.send("What is Kotlin Multiplatform?")
-    .collect { token -> print(token) }
-
-// Multi-turn — history managed automatically
-session.send("Give me a code example.").collect { print(it) }
-
-// Blocking (scripts / tests)
-val reply = session.sendBlocking("Summarise in one line.")
-
-// Lifecycle
-session.cancel()       // abort in-progress generation
-session.clearHistory() // fresh conversation, model stays loaded
-session.close()        // unload model, free resources
-```
-
----
-
-### Step 7 — Offline RAG (optional)
-
-Attach a `BM25RagStore` to inject local documents as context — no embedding model required.
-
-```kotlin
-import dev.deviceai.llm.rag.BM25RagStore
-
-val store = BM25RagStore(rawChunks = listOf(
-    "DeviceAI supports Android, iOS, and Desktop.",
-    "LLM inference uses llama.cpp with Metal on Apple Silicon."
-))
-
-val session = DeviceAI.llm.chat("/path/to/model.gguf") {
-    ragStore = store
-}
-
-session.send("Which platforms does DeviceAI support?").collect { print(it) }
-```
-
----
-
-## Environments
-
-| Environment | API key | Backend | Log level | Use for |
-|-------------|---------|---------|-----------|---------|
-| `Development` | not required | none — local model path | DEBUG | local dev, unit tests |
-| `Staging` | required | staging.api.deviceai.dev | DEBUG | pre-release QA |
-| `Production` | required | api.deviceai.dev | WARN | release builds |
-
----
-
-## Architecture
-
-```
-Your App
-    │
-    ▼
-DeviceAI.initialize(context, apiKey) { environment = Environment.Development }
-    │
-    ├── kotlin/core   (dev.deviceai:core)
-    │       DeviceAI           — unified SDK entry point
-    │       CoreSDKLogger       — structured, environment-aware logging
-    │       ModelRegistry       — model discovery, download, local management
-    │       PlatformStorage     — cross-platform file I/O
-    │
-    ├── kotlin/speech  (dev.deviceai:speech)
-    │       SpeechBridge        — unified STT + TTS Kotlin API
-    │           │
-    │           ├── Android / Desktop  →  JNI → libdeviceai_speech_jni.so/.dylib
-    │           └── iOS  →  C Interop → libspeech_merged.a
-    │                           ├── whisper.cpp   (STT)
-    │                           └── sherpa-onnx   (TTS + VAD)
-    │
-    └── kotlin/llm  (dev.deviceai:llm)
-            DeviceAI.llm.chat()   — creates a ChatSession
-            ChatSession            — stateful conversation, streaming Flow<String>
-            BM25RagStore           — offline retrieval-augmented generation
-                │
-                ├── Android / Desktop  →  JNI → libdeviceai_llm_jni.so/.dylib
-                └── iOS  →  C Interop → libllm_merged.a
-                                └── llama.cpp (Metal + CoreML)
-```
-
----
-
-## Features
-
-| Feature | Status |
-|---------|--------|
-| Speech-to-Text (Whisper) | ✅ Android, iOS, Desktop |
-| Text-to-Speech (sherpa-onnx VITS / Kokoro) | ✅ Android, iOS, Desktop |
-| Voice Activity Detection (Silero VAD) | ✅ Android, iOS, Desktop |
-| LLM inference (llama.cpp) | ✅ Android, iOS, Desktop |
-| Offline RAG (BM25) | ✅ Android, iOS, Desktop |
-| Streaming LLM generation (`Flow<String>`) | ✅ Android, iOS, Desktop |
-| Stateful `ChatSession` with auto history | ✅ |
-| Auto model download (HuggingFace) | ✅ |
-| GPU acceleration (Metal / Vulkan) | ✅ |
-| Cloud backend — OTA models, telemetry | 🚧 In progress |
-| Swift SDK | 🗓 Planned |
-| Flutter plugin | 🗓 Planned |
-| React Native module | 🗓 Planned |
-| Tool calling / voice agents | 🗓 Planned |
-
----
-
-## Models
-
-### Whisper (STT)
-
-| Model | Size | Speed | Best for |
-|-------|------|-------|----------|
-| `ggml-tiny.en.bin` | 75 MB | 7× real-time | English, mobile-first |
-| `ggml-base.bin` | 142 MB | Fast | Multilingual, balanced |
-| `ggml-small.bin` | 466 MB | Medium | Higher accuracy |
-
-### LLM (GGUF via llama.cpp)
-
-| Model | Size | Best for |
-|-------|------|----------|
-| SmolLM2-360M-Instruct (Q4) | ~220 MB | Fastest, mobile-first |
-| SmolLM2-1.7B-Instruct (Q4) | ~1 GB | Balanced |
-| Qwen2.5-0.5B-Instruct (Q4) | ~400 MB | Multilingual, compact |
-| Llama-3.2-1B-Instruct (Q4) | ~700 MB | Strong reasoning |
-
-Browse all available models via `LlmCatalog`.
-
----
-
-## Platform support
-
-| Platform | STT | TTS | LLM | Sample App |
-|----------|-----|-----|-----|------------|
-| Android (API 26+) | ✅ | ✅ | ✅ | ✅ |
-| iOS 17+ | ✅ | ✅ | ✅ | ✅ |
-| macOS Desktop | ✅ | ✅ | ✅ | ✅ |
-
----
-
-## Benchmarks
-
-| Device | Chip | Model | Audio | Inference | RTF |
-|--------|------|-------|-------|-----------|-----|
-| Redmi Note 9 Pro | Snapdragon 720G | whisper-tiny | 5.4s | 746ms | **0.14x** |
-
-> RTF < 1.0 = faster than real-time. 0.14x = ~7× faster than real-time on a mid-range Android phone.
-
----
-
-## Building from source
-
-**Prerequisites:** CMake 3.22+, Android NDK r26+, Xcode 26+ (iOS), Kotlin 2.2+
+## Run Locally
 
 ```bash
-git clone --recursive https://github.com/deviceai-labs/deviceai.git
-cd deviceai
-
-# Compile checks
-./gradlew :kotlin:core:compileKotlinJvm
-./gradlew :kotlin:speech:compileKotlinJvm
-./gradlew :kotlin:llm:compileKotlinJvm
-
-# Run the desktop sample
-./gradlew :samples:composeApp:run
+git clone https://github.com/your-org/ignitra-ai.git
+cd ignitra-ai
+npm install
 ```
 
----
+## Example Output
 
-## Roadmap
+| Input | Engine | Output |
+|---|---|---|
+| Token address | Token Analytics Engine | Liquidity quality, holder concentration, risk score, AI verdict |
+| Wallet address | Wallet Analytics Engine | PnL, winrate, drawdown, behavior labels, AI profile |
+| Token or narrative query | Research Agent | News brief, narrative summary, catalysts, red flags |
 
-- [x] Kotlin SDK — speech, LLM, RAG, streaming
-- [x] `DeviceAI` unified entry point with `Environment` + `CloudConfig` DSL
-- [x] `ChatSession` — stateful multi-turn LLM conversations
-- [ ] Backend integration — device registration, OTA model assignment, telemetry
-- [ ] Swift SDK — native iOS/macOS package
-- [ ] Flutter SDK
-- [ ] React Native SDK
-- [ ] Tool calling / voice agents (`DeviceAI.agent`)
+> [!WARNING]
+> Ignitra does not custody user funds and does not execute trades without a wallet signature
 
----
+## Use Cases
 
-## Sample App
+- Check whether a token is structurally solid or a short-term degen trap
+- Profile a wallet before copying, following, or fading it
+- Pull a fast narrative brief when a project starts moving
+- Connect analytics to bots, dashboards, n8n, Zapier, or internal tools
 
-`samples/composeApp/` is a working Compose Multiplatform demo. Runs on Android, iOS, and Desktop.
+## Why It’s Different
 
-```bash
-# Desktop
-./gradlew :samples:composeApp:run
+- One stack for UI, chat, extension, and API
+- AI acts like a co-pilot, not a blind black-box bot
+- Real usage feeds token utility through credits paid with $IGNITRA
 
-# Android — open in Android Studio and run on device/emulator
+## Product Snapshot
 
-# iOS — open samples/iosApp/iosApp.xcodeproj in Xcode and run
-```
+| Layer | What it does |
+|---|---|
+| Web App | Deep token and wallet research, agent runs, credit usage, job history |
+| Agents | Analytics Agent for tokens and wallets, Research Agent for narratives and news |
+| Execution | Swaps via Jupiter on Solana with user-side wallet confirmation |
+| Credits | Shared X / Y / Z style pricing across all interfaces |
+| Token Utility | Extra credits via $IGNITRA with 80% burn and 20% treasury split |
 
----
+> [!CAUTION]
+> Blockchain activity is irreversible and always carries market, liquidity, and execution risk
 
-## Contributing
+## Docs
 
-Issues and PRs welcome. Platform wrapper contributions (`ios/`, `flutter/`, `react-native/`) are especially welcome — each stub directory contains a README with the expected API surface.
+Full product docs, API flows, jobs, webhooks, and token mechanics live in the documentation portal
+
+- Docs: https://your-docs-link
+- API: POST `/v1/agents/token/analyze`
+- Jobs: `GET /v1/jobs/{job_id}`
+- Research: POST `/v1/agents/research/query`
+
+## License
+
+Internal product repository or custom project license
