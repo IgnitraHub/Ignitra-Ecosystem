@@ -1,0 +1,36 @@
+export interface LoggingConfig {
+  level: "debug" | "info" | "warn" | "error"
+  destinations: Array<"console" | "file" | "remote">
+  filePath?: string
+}
+
+export interface FeatureFlags {
+  enableDiagnostics: boolean
+  enableRealTimeAlerts: boolean
+  experimentalMode?: boolean
+}
+
+export interface ProjectConfig {
+  projectName: string
+  environment: "development" | "staging" | "production"
+  logging: LoggingConfig
+  features: FeatureFlags
+}
+
+/**
+ * Default config object
+ */
+export const defaultConfig: ProjectConfig = {
+  projectName: "LabCore",
+  environment: "development",
+  logging: {
+    level: "debug",
+    destinations: ["console", "file"],
+    filePath: "./logs/labcore.log",
+  },
+  features: {
+    enableDiagnostics: true,
+    enableRealTimeAlerts: false,
+    experimentalMode: false,
+  },
+}
